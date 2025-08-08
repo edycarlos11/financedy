@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Financeiro</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Tela de Login -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>🔐 Acesso Seguro</h1>
+                <p>Entre com suas credenciais para acessar o Dashboard Financeiro</p>
+            </div>
+            
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="username">👤 Usuário</label>
+                    <input type="text" id="username" required placeholder="Digite seu usuário">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">🔒 Senha</label>
+                    <input type="password" id="password" required placeholder="Digite sua senha">
+                </div>
+                
+                <button type="submit" class="btn btn-primary login-btn">🚀 Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard Principal -->
+    <div id="dashboardScreen" class="container" style="display: none;">
+        <div class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1>💰 Dashboard Financeiro</h1>
+                    <p>Controle completo das suas finanças pessoais</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="text-align: right;">
+                        <div style="font-size: 14px; font-weight: 600; color: var(--text-primary);">👤 Usuário: edy.s</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">🔒 Sessão ativa</div>
+                    </div>
+                    <button id="logoutBtn" class="btn btn-logout">
+                        🚪 Sair
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('overview')">
+                📊 Visão Geral
+            </button>
+            <button class="tab" onclick="showTab('transactions')">
+                💳 Lançamentos
+            </button>
+            <button class="tab" onclick="showTab('reports')">
+                📈 Relatórios
+            </button>
+            <button class="tab" onclick="showTab('goals')">
+                🎯 Metas
+            </button>
+        </div>
+
+        <!-- Visão Geral -->
+        <div id="overview" class="tab-content active">
+            <div class="form-section">
+                <div class="filters">
+                    <label for="overviewMonthFilter" style="font-weight: 500; margin-right: 10px;">📅 Filtrar por mês:</label>
+                    <select id="overviewMonthFilter" style="padding: 8px 12px; border: 1px solid #e1e1e0; border-radius: 6px; font-size: 14px;">
+                        <option value="">Selecione um mês...</option>
+                    </select>
+                    <button onclick="resetOverviewFilter()" class="btn btn-secondary" style="margin-left: 10px;">🔄 Mês Atual</button>
+                </div>
+            </div>
+
+            <div class="month-indicator" id="currentMonthIndicator">📅 Mês Atual</div>
+
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h4>💰 Total de Entradas</h4>
+                    <div class="value positive" id="totalIncome">R$ 0,00</div>
+                </div>
+                <div class="summary-card">
+                    <h4>💸 Total de Despesas</h4>
+                    <div class="value negative" id="totalExpenses">R$ 0,00</div>
+                    <div id="expenseComparison" style="font-size: 12px; margin-top: 5px; font-weight: 500;"></div>
+                </div>
+                <div class="summary-card">
+                    <h4>💵 Saldo Final</h4>
+                    <div class="value" id="finalBalance">R$ 0,00</div>
+                </div>
+                <div class="summary-card">
+                    <h4>📈 Investimentos</h4>
+                    <div class="value" id="totalInvestments">R$ 0,00</div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 30px;">
+                <h3>📊 Comparativo de Despesas Mensais</h3>
+                <div id="monthlyComparison"></div>
+            </div>
+
+            <div class="overview-grid">
+                <div class="card">
+                    <h3>📊 Resumo por Categoria</h3>
+                    <div id="categoryBreakdown"></div>
+                </div>
+                <div class="card">
+                    <h3>📈 Evolução Mensal</h3>
+                    <div class="chart-container">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lançamentos -->
+        <div id="transactions" class="tab-content">
+            <div class="form-section">
+                <h3>➕ Novo Lançamento</h3>
+                <form id="transactionForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>📅 Data</label>
+                            <input type="date" id="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>🔄 Tipo</label>
+                            <select id="type" required>
+                                <option value="">Selecione...</option>
+                                <option value="income">💰 Entrada</option>
+                                <option value="expense">💸 Despesa</option>
+                                <option value="investment">📈 Investimento</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>🏷️ Categoria</label>
+                            <select id="category" required>
+                                <option value="">Selecione...</option>
+                                <optgroup label="💰 RECEITAS">
+                                    <option value="salario">💼 Salário</option>
+                                    <option value="freelance">💻 Freelance</option>
+                                    <option value="investimento">📊 Investimento</option>
+                                </optgroup>
+                                <optgroup label="🏠 DESPESAS FIXAS">
+                                    <option value="aluguel">🏠 Aluguel</option>
+                                    <option value="condominio">🏢 Condomínio</option>
+                                    <option value="seguro_carro">🚗 Seguro do Carro</option>
+                                    <option value="licenciamento">📋 Licenciamento</option>
+                                    <option value="curso">📚 Curso</option>
+                                    <option value="iptu">🏠 IPTU</option>
+                                    <option value="ipva">🚗 IPVA</option>
+                                    <option value="emprestimos">💳 Empréstimos</option>
+                                </optgroup>
+                                <optgroup label="⚡ DESPESAS VARIÁVEIS">
+                                    <option value="luz">💡 Luz</option>
+                                    <option value="agua">💧 Água</option>
+                                    <option value="telefone">📱 Telefone Celular</option>
+                                    <option value="gas">🔥 Gás</option>
+                                    <option value="tv_streaming">📺 TV e Streaming</option>
+                                    <option value="internet">🌐 Internet</option>
+                                    <option value="uber_taxi">🚕 Uber e Táxi</option>
+                                    <option value="combustivel">⛽ Combustível</option>
+                                    <option value="estacionamento">🅿️ Estacionamento</option>
+                                    <option value="supermercado">🛒 Supermercado</option>
+                                    <option value="almoco_trabalho">🍽️ Almoço Trabalho</option>
+                                    <option value="delivery">🛵 Delivery</option>
+                                    <option value="medicamentos">💊 Medicamentos</option>
+                                    <option value="barbearia">✂️ Barbearia</option>
+                                    <option value="academia">💪 Academia</option>
+                                </optgroup>
+                                <optgroup label="🏥 DESPESAS EXTRAS">
+                                    <option value="medico">👨‍⚕️ Médico</option>
+                                    <option value="dentista">🦷 Dentista</option>
+                                    <option value="hospital">🏥 Hospital</option>
+                                    <option value="carro_extra">🔧 Carro (Manutenção)</option>
+                                    <option value="casa_extra">🔨 Casa (Manutenção)</option>
+                                    <option value="material_escolar">📝 Material Escolar</option>
+                                    <option value="uniforme">👕 Uniforme</option>
+                                </optgroup>
+                                <optgroup label="🎉 DESPESAS ADICIONAIS">
+                                    <option value="viagens">✈️ Viagens</option>
+                                    <option value="cinema_teatro">🎭 Cinema/Teatro</option>
+                                    <option value="restaurantes_bares">🍻 Restaurantes/Bares</option>
+                                    <option value="roupas">👔 Roupas</option>
+                                    <option value="calcados">👟 Calçados</option>
+                                    <option value="acessorios">💍 Acessórios</option>
+                                    <option value="presentes">🎁 Presentes</option>
+                                    <option value="outros">📦 Outros</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>💰 Valor (R$)</label>
+                            <input type="number" id="amount" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>💳 Forma de Pagamento</label>
+                            <select id="paymentMethod" required>
+                                <option value="">Selecione...</option>
+                                <option value="dinheiro">💵 Dinheiro</option>
+                                <option value="debito">💳 Cartão Débito</option>
+                                <option value="credito">💳 Cartão Crédito</option>
+                                <option value="pix">📱 PIX</option>
+                                <option value="transferencia">🏦 Transferência</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>📝 Descrição</label>
+                            <input type="text" id="description" placeholder="Descrição do lançamento">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">➕ Adicionar Lançamento</button>
+                </form>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>📋 Histórico de Lançamentos</h3>
+                    <div class="filters">
+                        <select id="filterMonth">
+                            <option value="">Todos os meses</option>
+                        </select>
+                        <select id="filterType">
+                            <option value="">Todos os tipos</option>
+                            <option value="income">💰 Entradas</option>
+                            <option value="expense">💸 Despesas</option>
+                            <option value="investment">📈 Investimentos</option>
+                        </select>
+                        <select id="filterCategory">
+                            <option value="">Todas as categorias</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table id="transactionsTable">
+                        <thead>
+                            <tr>
+                                <th>📅 Data</th>
+                                <th>🔄 Tipo</th>
+                                <th>🏷️ Categoria</th>
+                                <th>📝 Descrição</th>
+                                <th>💰 Valor</th>
+                                <th>💳 Pagamento</th>
+                                <th>🗑️ Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relatórios -->
+        <div id="reports" class="tab-content">
+            <div class="card">
+                <h3>📊 Resumo Mensal</h3>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metas -->
+        <div id="goals" class="tab-content">
+            <div class="form-section">
+                <h3>🎯 Definir Meta Mensal</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>💰 Meta de Economia (R$)</label>
+                        <input type="number" id="savingsGoal" step="0.01" placeholder="Ex: 1000.00">
+                    </div>
+                    <div class="form-group">
+                        <label>💸 Limite de Gastos (R$)</label>
+                        <input type="number" id="expenseLimit" step="0.01" placeholder="Ex: 3000.00">
+                    </div>
+                </div>
+                <button onclick="setGoals()" class="btn btn-primary">💾 Salvar Metas</button>
+            </div>
+
+            <div class="card">
+                <h3>📈 Progresso das Metas</h3>
+                <div id="goalsProgress">
+                    <p>Defina suas metas para acompanhar o progresso!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96c17b1d53176cc5',t:'MTc1NDY4MTk3OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
